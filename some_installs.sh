@@ -3,15 +3,17 @@
 #These are all the packages you must install for the project.
 #Most are for the GUI, mosquitto is what you use to set up the broker.
 
+#Installs necessary packages for linux systems (using Debian)
 packages=("mosquitto" "libglfw-dev" "libglfw3" "xorg-dev" "libxcb1-dev")
 for str in ${packages[@]}; 
 do
 	sudo apt install $str
 done
 
+#Clones necessary github repos in /usr/include
 githubs=("https://github.com/ocornut/imgui" "https://github.com/ShakaUVM/read")
 for str in ${githubs[@]}; 
 do
-	git clone $str
+	cd /usr/include/ && sudo git clone $str
 done
 
