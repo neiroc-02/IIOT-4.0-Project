@@ -207,7 +207,7 @@ int main(int, char**)
 	system((std::string("rm ") + PIPE_PATH).c_str());		//Removing previous named pipes
 	system((std::string("mkfifo ") + PIPE_PATH).c_str());	//Creating a new named pipe
 	system("sudo killall mosquitto_sub");					//Killing all old mosquitto subs to prevent multiple rewrites of the same data
-	system("(sudo mosquitto_sub -d -t   line1/# > log)&");	//Making a new mosquitto sub
+	system("(sudo mosquitto_sub -d -t line1/# > log)&");	//Making a new mosquitto sub
 	std::thread t1(parsing);								//Spawning a thread for the parser
 	t1.detach();											//Detaching it so it doesn't freeze the GUI
 
@@ -261,7 +261,7 @@ int main(int, char**)
 	ImGui_ImplOpenGL3_Init(glsl_version);
 	//TODO
 	//ImGuiIO& io = ImGui::GetIO();
-	io.Fonts->AddFontFromFileTTF("/home/neiropi/imgui/misc/fonts/Cousine-Regular.ttf", 14);
+	//io.Fonts->AddFontFromFileTTF("usr/include/imgui/misc/fonts/Cousine-Regular.ttf", 14);
 	//Also good to know:
 	//ImFont* font1 = io.Fonts->AddFontFromFile("font.ttf", size_pixels);
 	//ImGui::PushFont(font1);
