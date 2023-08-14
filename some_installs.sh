@@ -4,7 +4,7 @@
 #Most are for the GUI, mosquitto is what you use to set up the broker.
 
 #Installs necessary packages for linux systems (using Debian)
-packages=("mosquitto" "libglfw-dev" "libglfw3" "xorg-dev" "libxcb1-dev")
+packages=("mosquitto" "mosquitto-clients" "libglfw-dev" "libglfw3" "xorg-dev" "libxcb1-dev")
 for str in ${packages[@]}; 
 do
 	sudo apt install $str
