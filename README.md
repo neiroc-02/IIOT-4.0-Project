@@ -30,12 +30,24 @@ This serves as the heart of the demo. Mosquitto (MQTT) allows for the communicat
 
 Our Arduino and GUI code utilizes this functionality to communicate between everything involved in our network. The applications become clearer as you continue to read through our demo.
 
+### The Router
+
+In order to run the project, you must have a router to avoid firewalls. The way we chose to do this was to buy a cheap router and configure it to this setting:
+
+Name:     ```IT4 Project```
+
+Password: ```IOT12345```
+
+The Raspberry Pi must also be configured with a static IP address. You can either do that through the router or dhcpcd.conf file. A helpful article for the second method is included below:
+
+Helpful Link -> https://www.tomshardware.com/how-to/static-ip-raspberry-pi
+
 ### Crontab
 
 Helpful Link -> https://www.tomshardware.com/how-to/run-script-at-boot-raspberry-pi
 
 Another useful tip, if you would like the broker to start on boot, follow these steps.
-1. Type this in your terminal:       ```crontab -e       ```
+1. Type this in your terminal:       ```crontab -e```
 2. Inside your crontab, type this:   ```@reboot mosquitto```
 3. Exit and save the crontab and then the broker should start on boot.
 
