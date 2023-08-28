@@ -28,7 +28,30 @@ This serves as the heart of the demo. Mosquitto (MQTT) allows for the communicat
 
 ```mosquitto_pub -d -t “line1/thing1/out/message” -m “Hello World!”```
 
-Our Arduino and GUI code utilizes this functionality to communicate between everything involved in our network. The applications become clearer as you continue to read through our demo.
+Before you use the broker, you must edit your /etc/mosquitto/mosquitto.conf file. In the end, your mosquitto.conf file should look like this...
+
+```
+pid_file /run/mosquitto/mosquitto.pid
+
+persistence true
+persistence_location /var/lib/mosquitto/
+
+log_dest topic
+
+log_type error
+log_type warning
+log_type notice
+log_type information
+
+connection_messages true
+log_timestamp true
+allow_anonymous true
+listener 1883
+
+include_dir /etc/mosquitto/conf.d
+```
+
+Our Arduino and GUI code utilizes this functionality to communicate between everything involved in our network. The applications become clearer as you continue to read through our demo. 
 
 ### The Router
 
