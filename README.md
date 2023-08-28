@@ -65,7 +65,7 @@ DearImgui Github -> https://github.com/ocornut/imgui
 
 The GUI serves to display the data from the broker in an easy to visualize manner. This displays the power of Internet of Things systems without having to learn a SCADA system like Ignition. DearImgui is a C++ based Graphical User Interface Library that allows for the creation of windows that can display information or graphs. This allows us to display all the data being circulated in our network between the Arduino, Pi, Ignition (maybe), and the GUI itself.
 
-![GUIPic](https://github.com/neiroc-02/IIOT-4.0-Project/assets/113735504/3600a243-0254-4532-bd88-e93f07870005)
+![GUI](https://github.com/neiroc-02/IIOT-4.0-Project/assets/113735504/7854474c-ead8-4735-a595-4c0e23f0556e)
 
 ### Read Library
 
