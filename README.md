@@ -98,4 +98,4 @@ The Read library is used to simplify IO and make parsing mosquitto messages easi
 
 ## The PCB
 
-We are currently updating the PCB after Version 1.0. Version 1.0 is posted but there are a few bugs that need to fixed. If anyone notices them, please post your thougts on the issues section.
+We are currently updating the PCB after Version 1.0. The old version is posted but there are a few bugs that need to fixed. If anyone notices them, please post your thougts on the issues section.
