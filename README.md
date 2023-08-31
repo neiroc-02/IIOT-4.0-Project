@@ -90,6 +90,14 @@ The GUI serves to display the data from the broker in an easy to visualize manne
 
 ![GUI](https://github.com/neiroc-02/IIOT-4.0-Project/assets/113735504/7854474c-ead8-4735-a595-4c0e23f0556e)
 
+In order to run the GUI, first compile the code using ```make``` then run the executable ```IOT_GUI```. If you would like to edit the GUI, you may change main.cpp to fit your personal needs.
+
+## Ignition
+
+Ignition serves as a SCADA system to help visualize our project with or without the GUI. Ignition has more industrial uses as a SCADA system companies use to manage data from smart devices in their IOT networks. We can visualize the project using the Ignition Designer and the image below shows what the project looks like when you import the project, tags, and picture from the Ignition directory into your Designer.
+
+![Ignition Image](https://github.com/neiroc-02/IIOT-4.0-Project/assets/113735504/dd8a6df1-1cf6-4e26-9a34-46dd8060b78e)
+
 ### Read Library
 
 Read.h Github -> https://github.com/ShakaUVM/read
