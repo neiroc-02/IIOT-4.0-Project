@@ -28,7 +28,30 @@ This serves as the heart of the demo. Mosquitto (MQTT) allows for the communicat
 
 ```mosquitto_pub -d -t “line1/thing1/out/message” -m “Hello World!”```
 
-Our Arduino and GUI code utilizes this functionality to communicate between everything involved in our network. The applications become clearer as you continue to read through our demo.
+Before you use the broker, you must edit your /etc/mosquitto/mosquitto.conf file. In the end, your mosquitto.conf file should look like this...
+
+```
+pid_file /run/mosquitto/mosquitto.pid
+
+persistence true
+persistence_location /var/lib/mosquitto/
+
+log_dest topic
+
+log_type error
+log_type warning
+log_type notice
+log_type information
+
+connection_messages true
+log_timestamp true
+allow_anonymous true
+listener 1883
+
+include_dir /etc/mosquitto/conf.d
+```
+
+Our Arduino and GUI code utilizes this functionality to communicate between everything involved in our network. The applications become clearer as you continue to read through our demo. 
 
 ### The Router
 
@@ -65,7 +88,15 @@ DearImgui Github -> https://github.com/ocornut/imgui
 
 The GUI serves to display the data from the broker in an easy to visualize manner. This displays the power of Internet of Things systems without having to learn a SCADA system like Ignition. DearImgui is a C++ based Graphical User Interface Library that allows for the creation of windows that can display information or graphs. This allows us to display all the data being circulated in our network between the Arduino, Pi, Ignition (maybe), and the GUI itself.
 
-![GUIPic](https://github.com/neiroc-02/IIOT-4.0-Project/assets/113735504/3600a243-0254-4532-bd88-e93f07870005)
+![GUI](https://github.com/neiroc-02/IIOT-4.0-Project/assets/113735504/7854474c-ead8-4735-a595-4c0e23f0556e)
+
+In order to run the GUI, first compile the code using ```make``` then run the executable ```IOT_GUI```. If you would like to edit the GUI, you may change main.cpp to fit your personal needs.
+
+## Ignition
+
+Ignition serves as a SCADA system to help visualize our project with or without the GUI. Ignition has more industrial uses as a SCADA system companies use to manage data from smart devices in their IOT networks. We can visualize the project using the Ignition Designer and the image below shows what the project looks like when you import the project, tags, and picture from the Ignition directory into your Designer.
+
+![Ignition Image](https://github.com/neiroc-02/IIOT-4.0-Project/assets/113735504/dd8a6df1-1cf6-4e26-9a34-46dd8060b78e)
 
 ### Read Library
 
@@ -75,4 +106,4 @@ The Read library is used to simplify IO and make parsing mosquitto messages easi
 
 ## The PCB
 
-We are currently updating the PCB after Version 1.0. There were some issues in the build and we would like to make sure we publish one here that works and is functional. We appreciate your patience.
+We are currently updating the PCB after Version 1.0. The old version is posted but there are a few bugs that need to fixed. If anyone notices them, please post your thoughts on the issues section.
