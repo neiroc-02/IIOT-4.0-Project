@@ -175,7 +175,11 @@ void parsing(){
 			else things[device].stepSize = step;
 		}
 		else if (sensor == "stepperSpeed"){ //speed 1-20
-			things[device].stepSpeed = std::stoi(data);
+			int speed = 0;
+			if (isNumC(data.c_str())) speed = std::stoi(data);
+			if (speed >= 20) things[device].stepSpeed = 20;
+			else if (speed <= 1) things[device].stepSpeed = 1;
+			else things[device].stepSpeed = speed;
 		}
 		else if (sensor == "digitalIn"){
 			things[device].in = data;
@@ -210,6 +214,24 @@ int main(int, char**)
 	system("(sudo mosquitto_sub -d -t line1/# > log)&");	//Making a new mosquitto sub
 	std::thread t1(parsing);								//Spawning a thread for the parser
 	t1.detach();											//Detaching it so it doesn't freeze the GUI
+
+
+	//Meagan -- TODO: Mess with this to fix lights
+//	int light = 1;
+	for (std::pair<const std::string, Label> &p : device_list) {
+		
+		system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/out1\" -m \"") + std::to_string(0) + "\" > /dev/null)&").c_str());
+		system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/out2\" -m \"") + std::to_string(0) + "\" > /dev/null)&").c_str());
+		system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/out3\" -m \"") + std::to_string(0) + "\" > /dev/null)&").c_str());
+		system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/out4\" -m \"") + std::to_string(0) + "\" > /dev/null)&").c_str());
+//		light++;
+	}
+
+	//THIS WORKS FOR AN INDIVIDUAL LIGHT WITHIN A SPECIFIC THING
+//	system((std::string("(sudo mosquitto_pub -d -t \"line1/thing10/out/out1\" -m \"") + std::to_string(0) + "\" > /dev/null)&").c_str());
+	
+	//THIS IS AN EXAMPLE OF HOW TO PUBLISH TO THE LIGHTS
+//	system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/out4\" -m \"") + std::to_string(bit) + "\" > /dev/null)&").c_str());
 
 	glfwSetErrorCallback(glfw_error_callback);
 	if (!glfwInit())
@@ -288,9 +310,33 @@ int main(int, char**)
 
 	bool show_demo_window = false;
 	bool show_data = true;
-	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
+	//Meagan - Color Definitions 
+	ImColor backgroundColor(4, 71, 28);
+	ImColor black(0, 0, 0);
+	ImColor white(255, 255, 255);
+	ImColor titleColor(115, 169, 66);
+	ImColor titleColor_active(251, 97, 7);
+	ImColor checkColor();
+
+
+	ImVec4 clear_color = ImVec4(black);
+	//TODO THIS IS FOR SCALING 
 	ImGuiStyle& style = ImGui::GetStyle(); 						//These lines make everything bigger
 	style.ScaleAllSizes(1.5f);									//Change this number to adjust the scaling
+
+	//Meagan - Color Styling
+	style.Colors[ImGuiCol_WindowBg] = ImVec4(backgroundColor);
+	style.Colors[ImGuiCol_TitleBg] = ImVec4(black);
+	style.Colors[ImGuiCol_TitleBgActive] = ImVec4(titleColor);
+	style.Colors[ImGuiCol_Button] = ImVec4(black);
+	style.Colors[ImGuiCol_ButtonHovered] = ImVec4(black);
+	style.Colors[ImGuiCol_FrameBg] = ImVec4(black);
+	style.Colors[ImGuiCol_FrameBgHovered] = ImVec4(black);
+	style.Colors[ImGuiCol_FrameBgActive] = ImVec4(black);
+	style.Colors[ImGuiCol_CheckMark] = ImVec4(white);
+	style.Colors[ImGuiCol_SliderGrab] = ImVec4(backgroundColor);
+	style.Colors[ImGuiCol_SliderGrabActive] = ImVec4(backgroundColor);
 
 
 	// Main loop
@@ -425,24 +471,55 @@ int main(int, char**)
 
 
 					ImGui::Text("Want to Publish?");
-					
+/*					
 					if (ImGui::SmallButton("Message")){
 						if (std::string(msg[p.second.device_index]) != "") system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/message\" -m \"") + std::string(msg[p.second.device_index]) + "\" > /dev/null)&").c_str());	
 					}
 					ImGui::InputText("Send Message", msg[p.second.device_index], IM_ARRAYSIZE(msg[p.second.device_index]));
 
+*/
+				//MEAGAN 09/06
+					ImGui::PushItemWidth(-1);
+					ImGui::InputText("##Type Message", msg[p.second.device_index], IM_ARRAYSIZE(msg[p.second.device_index]));
+					ImGui::PopItemWidth();
+					ImGui::Spacing();
+					ImGui::SameLine(ImGui::GetWindowWidth() * (1.0/4.0));
+					if (ImGui::SmallButton("Update Message")){
+						if (std::string(msg[p.second.device_index]) != "") system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/message\" -m \"") + std::string(msg[p.second.device_index]) + "\" > /dev/null)&").c_str());	
+					}
 
+/*
 					if (ImGui::SmallButton("StepperStep")){
 						system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/stepperStep\" -m \"") + std::to_string(step[p.second.device_index]) + "\" > /dev/null)&").c_str());
 					}
 					ImGui::SliderInt("Update Stepper Step", &(step[p.second.device_index]), -2000, 2000);
+*/
+				//MEAGAN 09/06
+					
+					ImGui::PushItemWidth(-1);
+					ImGui::SliderInt("##Stepper Step", &(step[p.second.device_index]), -2000, 2000);	
+					ImGui::PopItemWidth();
+					ImGui::Spacing();
+					ImGui::SameLine(ImGui::GetWindowWidth() * (1.0/4.0));
+					if (ImGui::SmallButton("Update StepperStep")){
+						system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/stepperStep\" -m \"") + std::to_string(step[p.second.device_index]) + "\" > /dev/null)&").c_str());
+					}
 
-
+/*
 					if (ImGui::SmallButton("StepperSpeed")){
 						system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/stepperSpeed\" -m \"") + std::to_string(spd[p.second.device_index]) + "\" > /dev/null)&").c_str());
 					}
 					ImGui::SliderInt("Update Stepper Speed", &(spd[p.second.device_index]), 0, 20);
-
+*/
+				//MEAGAN 09/06
+					ImGui::PushItemWidth(-1);
+					ImGui::SliderInt("##Stepper Speed", &(spd[p.second.device_index]), 0, 20);
+					ImGui::PopItemWidth();
+					ImGui::Spacing();
+					ImGui::SameLine(ImGui::GetWindowWidth() * (1.0/4.0));
+					if (ImGui::SmallButton("Update StepperSpeed")){
+						system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/stepperSpeed\" -m \"") + std::to_string(spd[p.second.device_index]) + "\" > /dev/null)&").c_str());
+					}
 
 					ImGui::Unindent();
 					ImGui::End();
