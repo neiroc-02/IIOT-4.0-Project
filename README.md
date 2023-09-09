@@ -98,6 +98,8 @@ This demo utilizes the Arduino ESP32 since it has WiFi capabilities that allow i
 
 ### The PCB (Optional)
 
+![PCB](https://github.com/neiroc-02/IIOT-4.0-Project/assets/113735504/bab3020f-0d90-43dc-a1ba-198fa9198705)
+
 The PCB uses an ESP32 and serves as a hub for data to be published and sent to the MQTT Broker. We are currently updating the PCB after Version 1.0. The old version is posted but there are a few bugs that need to fixed. If anyone notices them, please post your thoughts on the issues section.
 
 ## The GUI
@@ -121,3 +123,19 @@ The Read library is used to simplify IO and make parsing mosquitto messages easi
 Ignition serves as a SCADA system to help visualize our project with or without the GUI. Ignition has more industrial uses as a SCADA system companies use to manage data from smart devices in their IOT networks. We can visualize the project using the Ignition Designer and the image below shows what the project looks like when you import the project, tags, and picture from the Ignition directory into your Designer.
 
 ![Ignition Image](https://github.com/neiroc-02/IIOT-4.0-Project/assets/113735504/dd8a6df1-1cf6-4e26-9a34-46dd8060b78e)
+
+### Downloading Ignition Gateway on the Pi
+
+As far as we know, you cannot run the Ignition Designer on a Raspberry Pi. However, you can download the Gateway on the Pi and run the Designer on your PC to view the project we have. The steps are as follows:
+
+1. Download Ignition [here](https://inductiveautomation.com/downloads/ignition/8.1.31) and be sure to chose the correct one for your Operating System. If you run a Raspberry Pi OS on a 64 bit Architecture, you should choose __Ignition - Linux AARCH64 zip__.
+2. After your Download finishes, open your terminal and enter the Downloads folder using ```cd /Downloads```.
+3. Next, run the following command to unzip the downloaded folder: ```sudo unzip {name of Downloaded file} /usr/local/ignition```
+4. After the folder finishes unzipping, enter the new directory: ```cd /usr/local/ignition/```
+5. Next, run this command to make all necessary files executable: ```chmod +x *.sh ignition-gateway```
+6. Then run the now exectuable Ignition script: ```./ignition.sh```. Congratulations! The Ignition Gateway has started.
+7. Now, enter your browser and run the local host: localhost:8088. Give the Gateway a few minutes to start.
+8. The first time you open it, it will ask you which form of Ignition you want to use. Choose the one that best fits your needs, but we chose Full Ignition when building this project.
+9. Now Ignition is running on the Raspberry Pi!
+
+Now that Ignition is downloaded, you can start ignition any time from the terminal by entering ```cd /usr/local/ignition``` then running the script ```./ignition.sh```. Then open the gateway by entering in your browser __localhost:8088__ and you will be able to view the gateway!
