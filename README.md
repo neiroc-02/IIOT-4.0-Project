@@ -130,7 +130,7 @@ As far as we know, you cannot run the Ignition Designer on a Raspberry Pi. Howev
 
 1. Download Ignition [here](https://inductiveautomation.com/downloads/ignition/8.1.31) and be sure to chose the correct one for your Operating System. If you run a Raspberry Pi OS on a 64 bit Architecture, you should choose __Ignition - Linux AARCH64 zip__.
 2. After your Download finishes, open your terminal and enter the Downloads folder using ```cd /Downloads```.
-3. Next, run the following command to unzip the downloaded folder: ```sudo unzip {name of Downloaded file} /usr/local/ignition```
+3. Next, run the following command to unzip the downloaded folder: ```sudo unzip {name of Downloaded file} -d /usr/local/ignition```
 4. After the folder finishes unzipping, enter the new directory: ```cd /usr/local/ignition/```
 5. Next, run this command to make all necessary files executable: ```chmod +x *.sh ignition-gateway```
 6. Then run the now exectuable Ignition script: ```./ignition.sh```. Congratulations! The Ignition Gateway has started.
