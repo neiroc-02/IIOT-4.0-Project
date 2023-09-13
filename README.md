@@ -138,4 +138,5 @@ As far as we know, you cannot run the Ignition Designer on a Raspberry Pi. Howev
 8. The first time you open it, it will ask you which form of Ignition you want to use. Choose the one that best fits your needs, but we chose Full Ignition when building this project.
 9. Now Ignition is running on the Raspberry Pi!
 
+
 Now that Ignition is downloaded, you can start ignition any time from the terminal by entering ```cd /usr/local/ignition``` then running the script ```./ignition.sh```. Then open the gateway by entering in your browser __localhost:8088__ and you will be able to view the gateway!
