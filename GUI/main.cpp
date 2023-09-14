@@ -359,7 +359,7 @@ int main(int, char**)
 	// Our state
 
 	bool show_demo_window = false;
-	bool show_list = true;
+	bool show_list = false;
 	bool show_picture = true;
 	bool show_menu_bar = true;
 
