@@ -40,6 +40,45 @@
 #include "../libs/emscripten/emscripten_mainloop_stub.h"
 #endif
 
+
+//MEAGAN BEGIN IMAGE
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
+// Simple helper function to load an image into a OpenGL texture with common settings
+bool LoadTextureFromFile(const char* filename, GLuint* out_texture, int* out_width, int* out_height)
+{
+    // Load from file
+    int image_width = 0;
+    int image_height = 0;
+    unsigned char* image_data = stbi_load(filename, &image_width, &image_height, NULL, 4);
+    if (image_data == NULL)
+        return false;
+
+    // Create a OpenGL texture identifier
+    GLuint image_texture;
+    glGenTextures(1, &image_texture);
+    glBindTexture(GL_TEXTURE_2D, image_texture);
+
+    // Setup filtering parameters for display
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); // This is required on WebGL for non power-of-two textures
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); // Same
+
+    // Upload pixels into texture
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
+    stbi_image_free(image_data);
+
+    *out_texture = image_texture;
+    *out_width = image_width;
+    *out_height = image_height;
+
+    return true;
+}
+//END IMAGE
+
+
 //This struct defines a "thing" (AKA a PCB) with all the data points it manages
 struct Thing {
 	int count = 0;
@@ -260,6 +299,8 @@ int main(int, char**)
 	//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 #endif
 
+
+
 	// Create window with graphics context
 	GLFWwindow* window = glfwCreateWindow(1280, 720, "IOT Project GUI", nullptr, nullptr);
 	if (window == nullptr)
@@ -281,6 +322,15 @@ int main(int, char**)
 	// Setup Platform/Renderer backends
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init(glsl_version);
+	
+//MEAGAN IMAGE RENDERING
+	int my_image_width = 0;
+	int my_image_height = 0;
+	GLuint my_image_texture = 0;
+	bool ret = LoadTextureFromFile("background.png", &my_image_texture, &my_image_width, &my_image_height);
+	IM_ASSERT(ret);
+//END IMAGE
+
 	//TODO
 	//ImGuiIO& io = ImGui::GetIO();
 	//io.Fonts->AddFontFromFileTTF("usr/include/imgui/misc/fonts/Cousine-Regular.ttf", 14);
@@ -309,7 +359,9 @@ int main(int, char**)
 	// Our state
 
 	bool show_demo_window = false;
-	bool show_data = true;
+	bool show_list = true;
+	bool show_picture = true;
+	bool show_menu_bar = true;
 
 	//Meagan - Color Definitions 
 	ImColor backgroundColor(4, 71, 28);
@@ -337,6 +389,8 @@ int main(int, char**)
 	style.Colors[ImGuiCol_CheckMark] = ImVec4(white);
 	style.Colors[ImGuiCol_SliderGrab] = ImVec4(backgroundColor);
 	style.Colors[ImGuiCol_SliderGrabActive] = ImVec4(backgroundColor);
+	style.Colors[ImGuiCol_MenuBarBg] = ImVec4(backgroundColor);
+	style.Colors[ImGuiCol_PopupBg] = ImVec4(backgroundColor);
 
 
 	// Main loop
@@ -349,7 +403,6 @@ int main(int, char**)
 		while (!glfwWindowShouldClose(window))
 #endif
 		{
-
 			//std::thread t1(parsing);
 			// Poll and handle events (inputs, window resize, etc.)
 			// You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
@@ -362,7 +415,30 @@ int main(int, char**)
 			ImGui_ImplGlfw_NewFrame();
 			ImGui::NewFrame();
 			// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-			if (show_demo_window) ImGui::ShowDemoWindow(&show_demo_window);
+
+			//BEGIN MENU BAR
+			if (show_menu_bar){
+				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(white));
+				ImGui::BeginMainMenuBar();
+
+				if (ImGui::BeginMenu("Menu")){
+					ImGui::MenuItem("List of Things", NULL, &show_list);
+					ImGui::EndMenu();
+				}
+				if (ImGui::BeginMenu("Things")){
+					for (std::pair<const std::string, Label> &p : device_list) {
+						ImGui::MenuItem(p.first.c_str(), NULL, &p.second.enabled);
+					}
+					ImGui::EndMenu();
+				}
+				
+				ImGui::EndMainMenuBar();
+				ImGui::PopStyleColor();
+			}
+			//END MENU BAR
+
+			//BEGIN DEMO WINDOW
+			if (show_demo_window)// ImGui::ShowDemoWindow(&show_demo_window);
 			// 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
 			{
 
@@ -372,7 +448,7 @@ int main(int, char**)
 				ImGui::Begin("Welcome to the IOT Project!");            // Create a window called "Hello, world!" and append into it.
 				ImGui::Text("Here's a list of options:");               // Display some text (you can use a format strings too)
 				ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-				ImGui::Checkbox("List of Things", &show_data);
+				ImGui::Checkbox("List of Things", &show_list);
 				//ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
 				ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
 				if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
@@ -382,19 +458,34 @@ int main(int, char**)
 				ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 				ImGui::End();
 			}
+			//END DEMO WINDOW
 
+			//BEGIN PICTURE WINDOW
+			if (show_picture){
+				ImGui::Begin("OpenGL Texture Text");
+				ImGui::Text("pointer = %p", my_image_texture);
+				ImGui::Text("size = %f x %f", my_image_width * .5, my_image_height * .5);
+				ImGui::Image((void*)(intptr_t)my_image_texture, ImVec2(my_image_width * 0.5, my_image_height * 0.5));
+				ImGui::End();
+			}
+			//END PICTURE WINDOW
+
+			//BEGIN LIST OF THINGS WINDOW
 			// 3. Show another simple window.
-			if (show_data){
-				ImGui::Begin("List of Things", &show_data);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+			if (show_list){
+				ImGui::Begin("List of Things", &show_list);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
 				ImGui::Text("Select the thing you would like to see data for:");
 
+			//BEGIN FOR LOOP TO LIST THINGS
 				for (std::pair<const std::string, Label> &p : device_list) {
 					ImGui::Checkbox(p.first.c_str(), &p.second.enabled);
 				}
-				if (ImGui::Button("Close Me")) show_data = false;
+				if (ImGui::Button("Close Me")) show_list = false;
 				ImGui::End();
 			}
+			//END FOR LOOP TO LIST THINGS
 
+			//BEGIN FIGURING OUT WHICH THING YOU CLICKED AND DISPLAYS THE DATA FOR THE SENSORS
 			for (std::pair<const std::string, Label> &p : device_list){
 				if (p.second.enabled){
 					ImGui::Begin(p.first.c_str(), &p.second.enabled);	
