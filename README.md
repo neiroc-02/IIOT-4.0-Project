@@ -78,15 +78,15 @@ If you would like the Moquitto Broker on your Pi to start at boot, you can use c
 
 ## The Router
 
+Helpful Link -> https://www.tomshardware.com/how-to/static-ip-raspberry-pi
+
 In order to run the project, you must have a router to avoid firewalls. The way we chose to do this was to buy a cheap router and configure it to this setting:
 
 Name:     ```IT4 Project```
 
 Password: ```IOT12345```
 
-The Raspberry Pi must also be configured with a static IP address. You can either do that through the router or dhcpcd.conf file. A helpful article for the second method is included below:
-
-Helpful Link -> https://www.tomshardware.com/how-to/static-ip-raspberry-pi
+The Raspberry Pi must also be configured with a static IP address. You can either do that through the router or dhcpcd.conf file. A helpful article for the second method is included in the link above.
 
 ## The ESP32
 
@@ -139,4 +139,6 @@ As far as we know, you cannot run the Ignition Designer on a Raspberry Pi. Howev
 9. Now Ignition is running on the Raspberry Pi!
 
 
-Now that Ignition is downloaded, you can start ignition any time from the terminal by entering ```cd /usr/local/ignition``` then running the script ```./ignition.sh```. Then open the gateway by entering in your browser __localhost:8088__ and you will be able to view the gateway!
+Now that Ignition is downloaded, you can start ignition any time from the terminal by entering ```cd /usr/local/ignition``` then running the script ```sudo ./ignition.sh start```. Then open the gateway by entering in your browser __localhost:8088__ and you will be able to view the gateway!
+
+If you also need the MQTT modules for Ignition, you must use this [link](https://inductiveautomation.com/downloads/third-party-modules/8.1.32) and locate the MQTT Distributor, Transmission, and Engine modules. Download all three and then from your Ignition Gateway you should be able to install the modules using the ```*.modl``` files you downloaded.
