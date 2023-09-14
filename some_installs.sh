@@ -17,3 +17,5 @@ do
 	cd /usr/include/ && sudo git clone $str
 done
 
+#Downloading a header file from this repo: https://github.com/nothings/stb.git
+sudo curl -o /usr/include/stb_image.h https://raw.githubusercontent.com/nothings/stb/master/stb_image.h
