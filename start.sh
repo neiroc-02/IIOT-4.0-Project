@@ -1,4 +1,5 @@
 #!/bin/bash
+#This script starts all necessary services to run the project along with the GUI
 
 mosquitto&
 
