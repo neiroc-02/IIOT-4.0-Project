@@ -2,7 +2,7 @@
 
 __Sponsored by the National Science Foundation (Award Number: 2202201)__
 
-__by: Matthew Graff, Neiro Cabrera, Bill Kerney, Meagan Eggert__
+__by: Matthew Graff, Neiro Cabrera, William (Bill) Kerney, Meagan Eggert__
 
 __From: Clovis Community College in Fresno, California__
 
