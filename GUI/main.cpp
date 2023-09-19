@@ -374,6 +374,11 @@ int main(int, char**)
 	ImColor titleColor(115, 169, 66);
 	ImColor titleColor_active(251, 97, 7);
 	ImColor checkColor();
+//	ImColor buttonGreen(3, 192, 60);
+//	ImColor buttonRed(255, 0, 0);
+	ImVec4 currentButton(0, 0, 0, 1);	
+	ImVec4 buttonGreen = ImVec4(0.2f, 0.8f, 0.2f, 1.0f);
+	ImVec4 buttonRed = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
 	//Background Color
 	ImVec4 clear_color = ImVec4(black);
 
@@ -391,7 +396,8 @@ int main(int, char**)
 	style.Colors[ImGuiCol_TitleBg] = ImVec4(black);
 	style.Colors[ImGuiCol_TitleBgActive] = ImVec4(titleColor);
 	style.Colors[ImGuiCol_Button] = ImVec4(black);
-	style.Colors[ImGuiCol_ButtonHovered] = ImVec4(black);
+	style.Colors[ImGuiCol_ButtonHovered] = currentButton;
+	style.Colors[ImGuiCol_ButtonActive] = currentButton;
 	style.Colors[ImGuiCol_FrameBg] = ImVec4(black);
 	style.Colors[ImGuiCol_FrameBgHovered] = ImVec4(black);
 	style.Colors[ImGuiCol_FrameBgActive] = ImVec4(black);
@@ -518,22 +524,21 @@ int main(int, char**)
 			for (std::pair<const std::string, Label> &p : device_list){
 				if (p.second.enabled){
 					ImGui::Begin(p.first.c_str(), &p.second.enabled);	
-					ImVec4 buttonGreen = ImVec4(0.2f, 0.8f, 0.2f, 1.0f);
-					ImVec4 buttonRed = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
 
+
+					Thing thing;
+					{
+						std::lock_guard<std::mutex> lock(thingProtector);
+						thing = things[p.second.device_name];
+					}
+					
 					//BEGIN DETAILS COLLAPSE
 					if (ImGui::CollapsingHeader("Details:", ImGuiTreeNodeFlags_None)){
-
-						Thing thing;
-						{
-							std::lock_guard<std::mutex> lock(thingProtector);
-							thing = things[p.second.device_name];
-						}
 						ImGui::AlignTextToFramePadding();
 						ImGui::Text("Count: "); 
 						ImGui::SameLine();
 						ImGui::SmallButton(std::to_string(thing.count).c_str());
-
+/*
 						if (thing.out[0] == 1) ImGui::PushStyleColor(ImGuiCol_Button, buttonGreen);
 						else ImGui::PushStyleColor(ImGuiCol_Button, buttonRed);
 	
@@ -543,10 +548,11 @@ int main(int, char**)
 						}
 
 						ImGui::PopStyleColor();
+*/
 						ImGui::Text("Sensor1: ");
 						ImGui::SameLine();
 						ImGui::SmallButton(std::to_string(thing.sensor1).c_str());
-
+/*
 						if (thing.out[1] == 1) ImGui::PushStyleColor(ImGuiCol_Button, buttonGreen);
 						else ImGui::PushStyleColor(ImGuiCol_Button, buttonRed);
 
@@ -555,11 +561,12 @@ int main(int, char**)
 							system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/out2\" -m \"") + std::to_string(bit) + "\" > /dev/null)&").c_str());
 						}
 						ImGui::PopStyleColor();
+*/
 						ImGui::Text("Sensor2: ");
 						ImGui::SameLine();
 						ImGui::SmallButton(std::to_string(thing.sensor2).c_str());
 
-
+/*
 						if (thing.out[2] == 1) ImGui::PushStyleColor(ImGuiCol_Button, buttonGreen);
 						else ImGui::PushStyleColor(ImGuiCol_Button, buttonRed);
 						if (ImGui::SameLine(300), ImGui::SmallButton("OUT 2")){
@@ -567,11 +574,12 @@ int main(int, char**)
 							system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/out3\" -m \"") + std::to_string(bit) + "\" > /dev/null)&").c_str());
 						}
 						ImGui::PopStyleColor();
+*/
 						ImGui::Text("Message: ");
 						ImGui::SameLine();
 						ImGui::SmallButton(thing.message.c_str());
 
-
+/*
 						if (thing.out[3] == 1) ImGui::PushStyleColor(ImGuiCol_Button, buttonGreen);
 						else ImGui::PushStyleColor(ImGuiCol_Button, buttonRed);
 						if (ImGui::SameLine(300), ImGui::SmallButton("OUT 3")){
@@ -579,7 +587,7 @@ int main(int, char**)
 							system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/out4\" -m \"") + std::to_string(bit) + "\" > /dev/null)&").c_str());
 						}
 						ImGui::PopStyleColor();
-
+*/
 						ImGui::Text("Digital In: ");
 						ImGui::SameLine();
 						ImGui::SmallButton(thing.in.c_str());
@@ -592,7 +600,81 @@ int main(int, char**)
 						ImGui::SameLine();
 						ImGui::SmallButton(std::to_string(thing.stepSpeed).c_str());
 					}//END DETAILS COLLAPSE
-					
+
+					//BEGIN LIGHTS COLLAPSE
+					if (ImGui::CollapsingHeader("Lights:", ImGuiTreeNodeFlags_None)){
+						//Light 0
+						if (thing.out[0] == 1){
+							ImGui::PushStyleColor(ImGuiCol_Button, buttonGreen);
+							currentButton = buttonGreen;
+							style.Colors[ImGuiCol_ButtonHovered] = currentButton;
+						}
+						else{
+							ImGui::PushStyleColor(ImGuiCol_Button, buttonRed);
+							currentButton = buttonRed;
+							style.Colors[ImGuiCol_ButtonHovered] = currentButton;
+						}
+	
+						if (ImGui::SmallButton("OUT 0")){
+							bool bit = !(thing.out[0]);
+							system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/out1\" -m \"") + std::to_string(bit) + "\" > /dev/null)&").c_str());
+						}
+						ImGui::PopStyleColor();
+						
+						//Light 1
+						if (thing.out[1] == 1){
+							ImGui::PushStyleColor(ImGuiCol_Button, buttonGreen);
+							currentButton = buttonGreen;
+							style.Colors[ImGuiCol_ButtonHovered] = currentButton;
+						}
+						else{
+							ImGui::PushStyleColor(ImGuiCol_Button, buttonRed);
+							currentButton = buttonRed;
+							style.Colors[ImGuiCol_ButtonHovered] = currentButton;
+						}
+
+						if (ImGui::SmallButton("OUT 1")){
+							bool bit = !(thing.out[1]);
+							system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/out2\" -m \"") + std::to_string(bit) + "\" > /dev/null)&").c_str());
+						}
+						ImGui::PopStyleColor();
+						
+						//Light 2
+						if (thing.out[2] == 1){
+							ImGui::PushStyleColor(ImGuiCol_Button, buttonGreen);
+							currentButton = buttonGreen;
+							style.Colors[ImGuiCol_ButtonHovered] = currentButton;
+						}
+						else{
+							ImGui::PushStyleColor(ImGuiCol_Button, buttonRed);
+							currentButton = buttonRed;
+							style.Colors[ImGuiCol_ButtonHovered] = currentButton;
+						}
+						if (ImGui::SmallButton("OUT 2")){
+							bool bit = !(thing.out[2]);
+							system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/out3\" -m \"") + std::to_string(bit) + "\" > /dev/null)&").c_str());
+						}
+						ImGui::PopStyleColor();
+
+						//Light 3
+						if (thing.out[3] == 1){
+							ImGui::PushStyleColor(ImGuiCol_Button, buttonGreen);
+							currentButton = buttonGreen;
+							style.Colors[ImGuiCol_ButtonHovered] = currentButton;
+						}
+						else{
+							ImGui::PushStyleColor(ImGuiCol_Button, buttonRed);
+							currentButton = buttonRed;
+							style.Colors[ImGuiCol_ButtonHovered] = currentButton;
+						}
+						if (ImGui::SmallButton("OUT 3")){
+							bool bit = !(thing.out[3]);
+							system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/out4\" -m \"") + std::to_string(bit) + "\" > /dev/null)&").c_str());
+						}
+						ImGui::PopStyleColor();
+					}//END LIGHT COLLAPSE
+
+
 					//BEGIN PUBLISH COLLAPSE
 					if (ImGui::CollapsingHeader("Publish Info:", ImGuiTreeNodeFlags_None)){
 
