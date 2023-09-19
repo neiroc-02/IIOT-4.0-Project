@@ -358,10 +358,14 @@ int main(int, char**)
 
 	// Our state
 
+	//Meagan - Possible Windows
 	bool show_demo_window = false;
 	bool show_list = false;
 	bool show_picture = true;
 	bool show_menu_bar = true;
+	//Meagan - Types of Viewer
+	bool small_screen = false;
+	bool large_screen = false;
 
 	//Meagan - Color Definitions 
 	ImColor backgroundColor(4, 71, 28);
@@ -370,12 +374,17 @@ int main(int, char**)
 	ImColor titleColor(115, 169, 66);
 	ImColor titleColor_active(251, 97, 7);
 	ImColor checkColor();
-
-
+	//Background Color
 	ImVec4 clear_color = ImVec4(black);
+
+	//Meagan - Sets us up to allow for window positioning
+	const ImGuiViewport* viewport = ImGui::GetMainViewport();
+	const ImVec2 base_pos = viewport->Pos;
+
 	//TODO THIS IS FOR SCALING 
 	ImGuiStyle& style = ImGui::GetStyle(); 						//These lines make everything bigger
-	style.ScaleAllSizes(1.5f);									//Change this number to adjust the scaling
+	style.ScaleAllSizes(1.f); //Change this number to adjust the scaling
+		
 
 	//Meagan - Color Styling
 	style.Colors[ImGuiCol_WindowBg] = ImVec4(backgroundColor);
@@ -425,6 +434,17 @@ int main(int, char**)
 					ImGui::MenuItem("List of Things", NULL, &show_list);
 					ImGui::EndMenu();
 				}
+				if (ImGui::BeginMenu("Choose Your Viewer")){
+					ImGui::MenuItem("Small Screen", NULL, &small_screen);
+					if (small_screen) {
+						large_screen = false;
+					}
+					ImGui::MenuItem("Large Screen", NULL, &large_screen);
+					if (large_screen){
+						small_screen = false;
+					}
+					ImGui::EndMenu();
+				}
 				if (ImGui::BeginMenu("Things")){
 					for (std::pair<const std::string, Label> &p : device_list) {
 						ImGui::MenuItem(p.first.c_str(), NULL, &p.second.enabled);
@@ -436,6 +456,13 @@ int main(int, char**)
 				ImGui::PopStyleColor();
 			}
 			//END MENU BAR
+
+			//BEGIN STYLING BASED ON WINDOW SIZE
+			if (small_screen){
+			}
+			if (large_screen){
+			}
+			//END STYLING BASED ON WINDOW SIZE
 
 			//BEGIN DEMO WINDOW
 			if (show_demo_window)// ImGui::ShowDemoWindow(&show_demo_window);
@@ -461,10 +488,12 @@ int main(int, char**)
 			//END DEMO WINDOW
 
 			//BEGIN PICTURE WINDOW
+			ImGui::SetNextWindowPos(ImVec2(base_pos.x, base_pos.y + 25)); //Set the position of the next window
+			//ImGui::SetNextWindowSize(ImVec2());
 			if (show_picture){
-				ImGui::Begin("OpenGL Texture Text");
-				ImGui::Text("pointer = %p", my_image_texture);
-				ImGui::Text("size = %f x %f", my_image_width * .5, my_image_height * .5);
+				ImGui::Begin("Example Picture Window");
+				//ImGui::Text("pointer = %p", my_image_texture);
+				//ImGui::Text("size = %f x %f", my_image_width * .5, my_image_height * .5);
 				ImGui::Image((void*)(intptr_t)my_image_texture, ImVec2(my_image_width * 0.5, my_image_height * 0.5));
 				ImGui::End();
 			}
@@ -492,126 +521,131 @@ int main(int, char**)
 					ImVec4 buttonGreen = ImVec4(0.2f, 0.8f, 0.2f, 1.0f);
 					ImVec4 buttonRed = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
 
-					Thing thing;
-					{
-						std::lock_guard<std::mutex> lock(thingProtector);
-						thing = things[p.second.device_name];
-					}
-					ImGui::AlignTextToFramePadding();
-					ImGui::Text("Count: "); 
-					ImGui::SameLine();
-					ImGui::SmallButton(std::to_string(thing.count).c_str());
+					//BEGIN DETAILS COLLAPSE
+					if (ImGui::CollapsingHeader("Details:", ImGuiTreeNodeFlags_None)){
 
-					if (thing.out[0] == 1) ImGui::PushStyleColor(ImGuiCol_Button, buttonGreen);
-					else ImGui::PushStyleColor(ImGuiCol_Button, buttonRed);
+						Thing thing;
+						{
+							std::lock_guard<std::mutex> lock(thingProtector);
+							thing = things[p.second.device_name];
+						}
+						ImGui::AlignTextToFramePadding();
+						ImGui::Text("Count: "); 
+						ImGui::SameLine();
+						ImGui::SmallButton(std::to_string(thing.count).c_str());
 
-					if (ImGui::SameLine(300), ImGui::SmallButton("OUT 0")){
-						bool bit = !(thing.out[0]);
-						system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/out1\" -m \"") + std::to_string(bit) + "\" > /dev/null)&").c_str());
-					}
+						if (thing.out[0] == 1) ImGui::PushStyleColor(ImGuiCol_Button, buttonGreen);
+						else ImGui::PushStyleColor(ImGuiCol_Button, buttonRed);
+	
+						if (ImGui::SameLine(300), ImGui::SmallButton("OUT 0")){
+							bool bit = !(thing.out[0]);
+							system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/out1\" -m \"") + std::to_string(bit) + "\" > /dev/null)&").c_str());
+						}
 
-					ImGui::PopStyleColor();
-					ImGui::Text("Sensor1: ");
-					ImGui::SameLine();
-					ImGui::SmallButton(std::to_string(thing.sensor1).c_str());
+						ImGui::PopStyleColor();
+						ImGui::Text("Sensor1: ");
+						ImGui::SameLine();
+						ImGui::SmallButton(std::to_string(thing.sensor1).c_str());
 
-					if (thing.out[1] == 1) ImGui::PushStyleColor(ImGuiCol_Button, buttonGreen);
-					else ImGui::PushStyleColor(ImGuiCol_Button, buttonRed);
+						if (thing.out[1] == 1) ImGui::PushStyleColor(ImGuiCol_Button, buttonGreen);
+						else ImGui::PushStyleColor(ImGuiCol_Button, buttonRed);
 
-					if (ImGui::SameLine(300), ImGui::SmallButton("OUT 1")){
-						bool bit = !(thing.out[1]);
-						system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/out2\" -m \"") + std::to_string(bit) + "\" > /dev/null)&").c_str());
-					}
-					ImGui::PopStyleColor();
-					ImGui::Text("Sensor2: ");
-					ImGui::SameLine();
-					ImGui::SmallButton(std::to_string(thing.sensor2).c_str());
-
-
-					if (thing.out[2] == 1) ImGui::PushStyleColor(ImGuiCol_Button, buttonGreen);
-					else ImGui::PushStyleColor(ImGuiCol_Button, buttonRed);
-					if (ImGui::SameLine(300), ImGui::SmallButton("OUT 2")){
-						bool bit = !(thing.out[2]);
-						system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/out3\" -m \"") + std::to_string(bit) + "\" > /dev/null)&").c_str());
-					}
-					ImGui::PopStyleColor();
-					ImGui::Text("Message: ");
-					ImGui::SameLine();
-					ImGui::SmallButton(thing.message.c_str());
+						if (ImGui::SameLine(300), ImGui::SmallButton("OUT 1")){
+							bool bit = !(thing.out[1]);
+							system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/out2\" -m \"") + std::to_string(bit) + "\" > /dev/null)&").c_str());
+						}
+						ImGui::PopStyleColor();
+						ImGui::Text("Sensor2: ");
+						ImGui::SameLine();
+						ImGui::SmallButton(std::to_string(thing.sensor2).c_str());
 
 
-					if (thing.out[3] == 1) ImGui::PushStyleColor(ImGuiCol_Button, buttonGreen);
-					else ImGui::PushStyleColor(ImGuiCol_Button, buttonRed);
-					if (ImGui::SameLine(300), ImGui::SmallButton("OUT 3")){
-						bool bit = !(thing.out[3]);
-						system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/out4\" -m \"") + std::to_string(bit) + "\" > /dev/null)&").c_str());
-					}
-					ImGui::PopStyleColor();
-
-					ImGui::Text("Digital In: ");
-					ImGui::SameLine();
-					ImGui::SmallButton(thing.in.c_str());
-
-					ImGui::Text("Stepper StepSize: ");
-					ImGui::SameLine();
-					ImGui::SmallButton(std::to_string(thing.stepSize).c_str());
-
-					ImGui::Text("Stepper Speed: ");
-					ImGui::SameLine();
-					ImGui::SmallButton(std::to_string(thing.stepSpeed).c_str());
+						if (thing.out[2] == 1) ImGui::PushStyleColor(ImGuiCol_Button, buttonGreen);
+						else ImGui::PushStyleColor(ImGuiCol_Button, buttonRed);
+						if (ImGui::SameLine(300), ImGui::SmallButton("OUT 2")){
+							bool bit = !(thing.out[2]);
+							system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/out3\" -m \"") + std::to_string(bit) + "\" > /dev/null)&").c_str());
+						}
+						ImGui::PopStyleColor();
+						ImGui::Text("Message: ");
+						ImGui::SameLine();
+						ImGui::SmallButton(thing.message.c_str());
 
 
-					ImGui::Text("Want to Publish?");
-/*					
-					if (ImGui::SmallButton("Message")){
-						if (std::string(msg[p.second.device_index]) != "") system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/message\" -m \"") + std::string(msg[p.second.device_index]) + "\" > /dev/null)&").c_str());	
-					}
-					ImGui::InputText("Send Message", msg[p.second.device_index], IM_ARRAYSIZE(msg[p.second.device_index]));
+						if (thing.out[3] == 1) ImGui::PushStyleColor(ImGuiCol_Button, buttonGreen);
+						else ImGui::PushStyleColor(ImGuiCol_Button, buttonRed);
+						if (ImGui::SameLine(300), ImGui::SmallButton("OUT 3")){
+							bool bit = !(thing.out[3]);
+							system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/out4\" -m \"") + std::to_string(bit) + "\" > /dev/null)&").c_str());
+						}
+						ImGui::PopStyleColor();
 
-*/
-				//MEAGAN 09/06
-					ImGui::PushItemWidth(-1);
-					ImGui::InputText("##Type Message", msg[p.second.device_index], IM_ARRAYSIZE(msg[p.second.device_index]));
-					ImGui::PopItemWidth();
-					ImGui::Spacing();
-					ImGui::SameLine(ImGui::GetWindowWidth() * (1.0/4.0));
-					if (ImGui::SmallButton("Update Message")){
-						if (std::string(msg[p.second.device_index]) != "") system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/message\" -m \"") + std::string(msg[p.second.device_index]) + "\" > /dev/null)&").c_str());	
-					}
+						ImGui::Text("Digital In: ");
+						ImGui::SameLine();
+						ImGui::SmallButton(thing.in.c_str());
 
-/*
-					if (ImGui::SmallButton("StepperStep")){
-						system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/stepperStep\" -m \"") + std::to_string(step[p.second.device_index]) + "\" > /dev/null)&").c_str());
-					}
-					ImGui::SliderInt("Update Stepper Step", &(step[p.second.device_index]), -2000, 2000);
-*/
-				//MEAGAN 09/06
+						ImGui::Text("Stepper StepSize: ");
+						ImGui::SameLine();
+						ImGui::SmallButton(std::to_string(thing.stepSize).c_str());
+
+						ImGui::Text("Stepper Speed: ");
+						ImGui::SameLine();
+						ImGui::SmallButton(std::to_string(thing.stepSpeed).c_str());
+					}//END DETAILS COLLAPSE
 					
-					ImGui::PushItemWidth(-1);
-					ImGui::SliderInt("##Stepper Step", &(step[p.second.device_index]), -2000, 2000);	
-					ImGui::PopItemWidth();
-					ImGui::Spacing();
-					ImGui::SameLine(ImGui::GetWindowWidth() * (1.0/4.0));
-					if (ImGui::SmallButton("Update StepperStep")){
-						system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/stepperStep\" -m \"") + std::to_string(step[p.second.device_index]) + "\" > /dev/null)&").c_str());
-					}
+					//BEGIN PUBLISH COLLAPSE
+					if (ImGui::CollapsingHeader("Publish Info:", ImGuiTreeNodeFlags_None)){
+
+						//ImGui::Text("Want to Publish?");
+/*					
+						if (ImGui::SmallButton("Message")){
+							if (std::string(msg[p.second.device_index]) != "") system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/message\" -m \"") + std::string(msg[p.second.device_index]) + "\" > /dev/null)&").c_str());	
+						}
+						ImGui::InputText("Send Message", msg[p.second.device_index], IM_ARRAYSIZE(msg[p.second.device_index]));
+
+*/
+					//MEAGAN 09/06
+						ImGui::PushItemWidth(-1);
+						ImGui::InputText("##Type Message", msg[p.second.device_index], IM_ARRAYSIZE(msg[p.second.device_index]));
+						ImGui::PopItemWidth();
+						ImGui::Spacing();
+						ImGui::SameLine(ImGui::GetWindowWidth() * (1.0/4.0));
+						if (ImGui::SmallButton("Update Message")){
+							if (std::string(msg[p.second.device_index]) != "") system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/message\" -m \"") + std::string(msg[p.second.device_index]) + "\" > /dev/null)&").c_str());	
+						}
 
 /*
-					if (ImGui::SmallButton("StepperSpeed")){
-						system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/stepperSpeed\" -m \"") + std::to_string(spd[p.second.device_index]) + "\" > /dev/null)&").c_str());
-					}
-					ImGui::SliderInt("Update Stepper Speed", &(spd[p.second.device_index]), 0, 20);
+						if (ImGui::SmallButton("StepperStep")){
+							system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/stepperStep\" -m \"") + std::to_string(step[p.second.device_index]) + "\" > /dev/null)&").c_str());
+						}
+						ImGui::SliderInt("Update Stepper Step", &(step[p.second.device_index]), -2000, 2000);
 */
-				//MEAGAN 09/06
-					ImGui::PushItemWidth(-1);
-					ImGui::SliderInt("##Stepper Speed", &(spd[p.second.device_index]), 0, 20);
-					ImGui::PopItemWidth();
-					ImGui::Spacing();
-					ImGui::SameLine(ImGui::GetWindowWidth() * (1.0/4.0));
-					if (ImGui::SmallButton("Update StepperSpeed")){
-						system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/stepperSpeed\" -m \"") + std::to_string(spd[p.second.device_index]) + "\" > /dev/null)&").c_str());
-					}
+					//MEAGAN 09/06
+						ImGui::PushItemWidth(-1);
+						ImGui::SliderInt("##Stepper Step", &(step[p.second.device_index]), -2000, 2000);	
+						ImGui::PopItemWidth();
+						ImGui::Spacing();
+						ImGui::SameLine(ImGui::GetWindowWidth() * (1.0/4.0));
+						if (ImGui::SmallButton("Update StepperStep")){
+							system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/stepperStep\" -m \"") + std::to_string(step[p.second.device_index]) + "\" > /dev/null)&").c_str());
+						}	
 
+/*
+						if (ImGui::SmallButton("StepperSpeed")){
+							system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/stepperSpeed\" -m \"") + std::to_string(spd[p.second.device_index]) + "\" > /dev/null)&").c_str());
+						}
+						ImGui::SliderInt("Update Stepper Speed", &(spd[p.second.device_index]), 0, 20);
+*/
+					//MEAGAN 09/06
+						ImGui::PushItemWidth(-1);
+						ImGui::SliderInt("##Stepper Speed", &(spd[p.second.device_index]), 0, 20);
+						ImGui::PopItemWidth();
+						ImGui::Spacing();
+						ImGui::SameLine(ImGui::GetWindowWidth() * (1.0/4.0));
+						if (ImGui::SmallButton("Update StepperSpeed")){
+							system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/stepperSpeed\" -m \"") + std::to_string(spd[p.second.device_index]) + "\" > /dev/null)&").c_str());
+						}
+					}
 					ImGui::Unindent();
 					ImGui::End();
 				}
