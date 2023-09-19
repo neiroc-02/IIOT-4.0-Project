@@ -524,14 +524,15 @@ int main(int, char**)
 			for (std::pair<const std::string, Label> &p : device_list){
 				if (p.second.enabled){
 					ImGui::Begin(p.first.c_str(), &p.second.enabled);	
-
+					ImGui::Columns(2);
 
 					Thing thing;
 					{
 						std::lock_guard<std::mutex> lock(thingProtector);
 						thing = things[p.second.device_name];
 					}
-					
+					ImGui::Image((void*)(intptr_t)my_image_texture, ImVec2(my_image_width * 0.5, my_image_height * 0.5));
+					ImGui::NextColumn();
 					//BEGIN DETAILS COLLAPSE
 					if (ImGui::CollapsingHeader("Details:", ImGuiTreeNodeFlags_None)){
 						ImGui::AlignTextToFramePadding();
@@ -727,7 +728,8 @@ int main(int, char**)
 						if (ImGui::SmallButton("Update StepperSpeed")){
 							system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/stepperSpeed\" -m \"") + std::to_string(spd[p.second.device_index]) + "\" > /dev/null)&").c_str());
 						}
-					}
+					}//END PUBLISH COLLAPSE
+					ImGui::Columns(1);
 					ImGui::Unindent();
 					ImGui::End();
 				}
