@@ -142,3 +142,6 @@ As far as we know, you cannot run the Ignition Designer on a Raspberry Pi. Howev
 Now that Ignition is downloaded, you can start ignition any time from the terminal by entering ```cd /usr/local/ignition``` then running the script ```sudo ./ignition.sh start```. Then open the gateway by entering in your browser __localhost:8088__ and you will be able to view the gateway!
 
 If you also need the MQTT modules for Ignition, you must use this [link](https://inductiveautomation.com/downloads/third-party-modules/8.1.32) and locate the MQTT Distributor, Transmission, and Engine modules. Download all three and then from your Ignition Gateway you should be able to install the modules using the ```*.modl``` files you downloaded.
+
+### Ignition Licenses for Education
+Inductive Automation partners with qualifying educational institutions to provide free Ignition licenses to students anywhere in the world!  Apply here: https://inductiveautomation.com/educational-engagement
