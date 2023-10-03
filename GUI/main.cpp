@@ -88,7 +88,7 @@ struct Thing {
 	std::array<bool, 4> out;
 	std::string message = "Null";
 	int stepSize = 0;
-	int stepSpeed = 5;
+	int stepSpeed = 0;
 };
 
 struct Label { //These labels are used to
@@ -299,8 +299,6 @@ int main(int, char**)
 	//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 #endif
 
-
-
 	// Create window with graphics context
 	GLFWwindow* window = glfwCreateWindow(1280, 720, "IOT Project GUI", nullptr, nullptr);
 	if (window == nullptr)
@@ -385,6 +383,9 @@ int main(int, char**)
 	//Meagan - Sets us up to allow for window positioning
 	const ImGuiViewport* viewport = ImGui::GetMainViewport();
 	const ImVec2 base_pos = viewport->Pos;
+	ImVec2 viewportSize = ImGui::GetMainViewport()->Size;
+	float maxView_x = viewportSize.x;
+	float maxView_y = viewportSize.y;
 
 	//TODO THIS IS FOR SCALING 
 	ImGuiStyle& style = ImGui::GetStyle(); 						//These lines make everything bigger
@@ -495,12 +496,16 @@ int main(int, char**)
 
 			//BEGIN PICTURE WINDOW
 			ImGui::SetNextWindowPos(ImVec2(base_pos.x, base_pos.y + 25)); //Set the position of the next window
-			//ImGui::SetNextWindowSize(ImVec2());
+			ImGui::SetNextWindowSize(ImVec2(maxView_x, maxView_y), ImGuiCond_FirstUseEver);
+			ImVec2 test;
 			if (show_picture){
 				ImGui::Begin("Example Picture Window");
 				//ImGui::Text("pointer = %p", my_image_texture);
 				//ImGui::Text("size = %f x %f", my_image_width * .5, my_image_height * .5);
 				ImGui::Image((void*)(intptr_t)my_image_texture, ImVec2(my_image_width * 0.5, my_image_height * 0.5));
+				
+				test = ImGui::GetWindowSize();
+
 				ImGui::End();
 			}
 			//END PICTURE WINDOW
@@ -520,11 +525,15 @@ int main(int, char**)
 			}
 			//END FOR LOOP TO LIST THINGS
 
+//			ImGui::SetNextWindowSizeConstraints(ImVec2(test.x, test.y), ImVec2(test.x, test.y));
+			ImGui::SetNextWindowPos(ImVec2(base_pos.x, base_pos.y + 25)); //Set the position of the next window
+			ImGui::SetNextWindowSize(ImVec2(test.x - 10, 0));
 			//BEGIN FIGURING OUT WHICH THING YOU CLICKED AND DISPLAYS THE DATA FOR THE SENSORS
 			for (std::pair<const std::string, Label> &p : device_list){
 				if (p.second.enabled){
-					ImGui::Begin(p.first.c_str(), &p.second.enabled);	
+					ImGui::Begin(p.first.c_str(), &p.second.enabled, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);	
 					ImGui::Columns(2);
+					ImGui::SetColumnWidth(0, my_image_width * 0.5);
 
 					Thing thing;
 					{
@@ -593,9 +602,20 @@ int main(int, char**)
 						ImGui::SameLine();
 						ImGui::SmallButton(thing.in.c_str());
 
-						ImGui::Text("Stepper StepSize: ");
+						ImGui::Text("Stepper Run: ");
 						ImGui::SameLine();
-						ImGui::SmallButton(std::to_string(thing.stepSize).c_str());
+						std::string outputStr = "";
+						if (thing.stepSize == 0){
+							outputStr = "Stopped";
+						}
+						else if (thing.stepSize == -1){
+							outputStr = "Reversed";
+						}
+						else if (thing.stepSize == 1){
+							outputStr = "Forward";
+						}
+						ImGui::SmallButton(outputStr.c_str());
+						//ImGui::SmallButton(std::to_string(thing.stepSize).c_str());
 
 						ImGui::Text("Stepper Speed: ");
 						ImGui::SameLine();
@@ -692,7 +712,7 @@ int main(int, char**)
 						ImGui::InputText("##Type Message", msg[p.second.device_index], IM_ARRAYSIZE(msg[p.second.device_index]));
 						ImGui::PopItemWidth();
 						ImGui::Spacing();
-						ImGui::SameLine(ImGui::GetWindowWidth() * (1.0/4.0));
+						ImGui::SameLine(ImGui::GetColumnWidth() * (1.0/4.0));
 						if (ImGui::SmallButton("Update Message")){
 							if (std::string(msg[p.second.device_index]) != "") system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/message\" -m \"") + std::string(msg[p.second.device_index]) + "\" > /dev/null)&").c_str());	
 						}
@@ -705,11 +725,17 @@ int main(int, char**)
 */
 					//MEAGAN 09/06
 						ImGui::PushItemWidth(-1);
-						ImGui::SliderInt("##Stepper Step", &(step[p.second.device_index]), -2000, 2000);	
+						ImGui::RadioButton("Reverse", &(step[p.second.device_index]), -1);
+						ImGui::SameLine();
+						ImGui::RadioButton("Stop", &(step[p.second.device_index]), 0);
+						ImGui::SameLine();
+						ImGui::RadioButton("Forward", &(step[p.second.device_index]), 1);
+
+						//ImGui::SliderInt("##Stepper Run", &(step[p.second.device_index]), -2000, 2000);	
 						ImGui::PopItemWidth();
 						ImGui::Spacing();
-						ImGui::SameLine(ImGui::GetWindowWidth() * (1.0/4.0));
-						if (ImGui::SmallButton("Update StepperStep")){
+						ImGui::SameLine(ImGui::GetColumnWidth() * (1.0/4.0));
+						if (ImGui::SmallButton("Update StepperRun")){
 							system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/stepperStep\" -m \"") + std::to_string(step[p.second.device_index]) + "\" > /dev/null)&").c_str());
 						}	
 
@@ -724,7 +750,7 @@ int main(int, char**)
 						ImGui::SliderInt("##Stepper Speed", &(spd[p.second.device_index]), 0, 20);
 						ImGui::PopItemWidth();
 						ImGui::Spacing();
-						ImGui::SameLine(ImGui::GetWindowWidth() * (1.0/4.0));
+						ImGui::SameLine(ImGui::GetColumnWidth() * (1.0/4.0));
 						if (ImGui::SmallButton("Update StepperSpeed")){
 							system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/stepperSpeed\" -m \"") + std::to_string(spd[p.second.device_index]) + "\" > /dev/null)&").c_str());
 						}
