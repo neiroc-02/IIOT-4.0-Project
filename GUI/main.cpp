@@ -408,6 +408,8 @@ int main(int, char**)
 	style.Colors[ImGuiCol_MenuBarBg] = ImVec4(backgroundColor);
 	style.Colors[ImGuiCol_PopupBg] = ImVec4(backgroundColor);
 
+	//Meagan - Hidden Columns
+	bool showDetails = false;
 
 	// Main loop
 #ifdef __EMSCRIPTEN__
@@ -512,6 +514,8 @@ int main(int, char**)
 
 			//BEGIN LIST OF THINGS WINDOW
 			// 3. Show another simple window.
+
+
 			if (show_list){
 				ImGui::Begin("List of Things", &show_list);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
 				ImGui::Text("Select the thing you would like to see data for:");
@@ -527,11 +531,21 @@ int main(int, char**)
 
 //			ImGui::SetNextWindowSizeConstraints(ImVec2(test.x, test.y), ImVec2(test.x, test.y));
 			ImGui::SetNextWindowPos(ImVec2(base_pos.x, base_pos.y + 25)); //Set the position of the next window
-			ImGui::SetNextWindowSize(ImVec2(test.x - 10, 0));
+			if (showDetails){
+				ImGui::SetNextWindowSize(ImVec2(test.x - 10, 0));
+			}
+			else {
+				ImGui::SetNextWindowSize(ImVec2(my_image_width * 0.5, 0));
+			}
 			//BEGIN FIGURING OUT WHICH THING YOU CLICKED AND DISPLAYS THE DATA FOR THE SENSORS
 			for (std::pair<const std::string, Label> &p : device_list){
 				if (p.second.enabled){
-					ImGui::Begin(p.first.c_str(), &p.second.enabled, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);	
+					ImGui::Begin(p.first.c_str(), &p.second.enabled, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
+					if (!showDetails){
+						ImGui::Checkbox("Show Details", &showDetails);
+						ImGui::Image((void*)(intptr_t)my_image_texture, ImVec2(my_image_width * 0.5, my_image_height * 0.5));
+					}
+					else {
 					ImGui::Columns(2);
 					ImGui::SetColumnWidth(0, my_image_width * 0.5);
 
@@ -540,7 +554,13 @@ int main(int, char**)
 						std::lock_guard<std::mutex> lock(thingProtector);
 						thing = things[p.second.device_name];
 					}
+					ImGui::Checkbox("Show Details", &showDetails);
+					if (showDetails) {
+						ImGui::SameLine();
+						ImGui::Text("Updated: True");
+					}
 					ImGui::Image((void*)(intptr_t)my_image_texture, ImVec2(my_image_width * 0.5, my_image_height * 0.5));
+
 					ImGui::NextColumn();
 					//BEGIN DETAILS COLLAPSE
 					if (ImGui::CollapsingHeader("Details:", ImGuiTreeNodeFlags_None)){
@@ -757,7 +777,9 @@ int main(int, char**)
 					}//END PUBLISH COLLAPSE
 					ImGui::Columns(1);
 					ImGui::Unindent();
+					}
 					ImGui::End();
+					
 				}
 			}
 			// Rendering
