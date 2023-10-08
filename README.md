@@ -129,7 +129,7 @@ Ignition serves as a SCADA system to help visualize our project with or without 
 As far as we know, you cannot run the Ignition Designer on a Raspberry Pi. However, you can download the Gateway on the Pi and run the Designer on your PC to view the project we have. The steps are as follows:
 
 1. Download Ignition [here](https://inductiveautomation.com/downloads/ignition/8.1.31) and be sure to chose the correct one for your Operating System. If you run a Raspberry Pi OS on a 64 bit Architecture, you should choose __Ignition - Linux AARCH64 zip__.
-2. After your Download finishes, open your terminal and enter the Downloads folder using ```cd /Downloads```.
+2. After your Download finishes, open your terminal and enter the Downloads folder using ```cd Downloads```.
 3. Next, run the following command to unzip the downloaded folder: ```sudo unzip {name of Downloaded file} -d /usr/local/ignition```
 4. After the folder finishes unzipping, enter the new directory: ```cd /usr/local/ignition/```
 5. Next, run this command to make all necessary files executable: ```sudo chmod +x *.sh ignition-gateway```
