@@ -141,7 +141,18 @@ As far as we know, you cannot run the Ignition Designer on a Raspberry Pi. Howev
 
 Now that Ignition is downloaded, you can start ignition any time from the terminal by entering ```cd /usr/local/ignition``` then running the script ```sudo ./ignition.sh start```. Then open the gateway by entering in your browser __localhost:8088__ and you will be able to view the gateway!
 
-If you also need the MQTT modules for Ignition, you must use this [link](https://inductiveautomation.com/downloads/third-party-modules/8.1.32) and locate the MQTT Distributor, Transmission, and Engine modules. Download all three and then from your Ignition Gateway you should be able to install the modules using the ```*.modl``` files you downloaded.
+### Installing MQTT Modules on Ignition
+To install the MQTT modules for Ignition, you must do the following (see this ![video](https://inductiveautomation.com/resources/video/mqtt-distributor-module) for more information):
+1. Use this [link](https://inductiveautomation.com/downloads/third-party-modules/8.1.32) and locate the MQTT Distributor, Transmission, and Engine modules. Download all three and then from your Ignition Gateway you should be able to install the modules using the ```*.modl``` files you downloaded.
+2. Open the MQTT server using the web browser on the Pi.In a web browser, type http://localhost:8088 to the ignition server.
+3. Go to Config/Sytem/Modules then locate "Install or Upgrade a Module..." at the bottom of the page.
+4. Now you will see these modules listed at the bottom of the Config bar.
+
+### Configuring MQTT Engrine Module on Ignition
+1. Click on Config/MQTT Engine/Settings.
+2. In the General Tab unselect: "Block outbound edge node tag writes" and "Block outbound device tag writes."  Then save changes.
+3. Under Servers "Create new MQTT Server Settings.  Name new Server "PI" (so that this matches other files you download). Add URL (i.e. tcp://192.168.10.2.) Then click "Create New MQTT Server Settings."
+4. Under Namespace/Custom give a name and put the # sound to subscribe to everything, then save changes.
 
 ### Ignition Licenses for Education
 Inductive Automation partners with qualifying educational institutions to provide free Ignition licenses to students anywhere in the world!  Apply here: https://inductiveautomation.com/educational-engagement
