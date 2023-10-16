@@ -122,7 +122,7 @@ The Read library is used to simplify IO and make parsing mosquitto messages easi
 
 Ignition serves as a SCADA system to help visualize our project with or without the GUI. Ignition has more industrial uses as a SCADA system companies use to manage data from smart devices in their IOT networks. We can visualize the project using the Ignition Designer and the image below shows what the project looks like when you import the project, tags, and picture from the Ignition directory into your Designer.
 
-![Ignition Image](https://github.com/neiroc-02/IIOT-4.0-Project/assets/113735504/dd8a6df1-1cf6-4e26-9a34-46dd8060b78e)
+![Ignition Perspective](https://github.com/neiroc-02/IIOT-4.0-Project/assets/140917053/6f35b826-1244-40c7-8dd2-d0304887d41d)
 
 ### Downloading Ignition Gateway on the Pi
 
