@@ -122,11 +122,11 @@ The Read library is used to simplify IO and make parsing mosquitto messages easi
 
 Ignition serves as a SCADA system to help visualize our project with or without the GUI. Ignition has more industrial uses as a SCADA system companies use to manage data from smart devices in their IOT networks. We can visualize the project using the Ignition Designer and the image below shows what the project looks like when you import the project, tags, and picture from the Ignition directory into your Designer.
 
-![Ignition Perspective](https://github.com/neiroc-02/IIOT-4.0-Project/assets/140917053/6f35b826-1244-40c7-8dd2-d0304887d41d)
+[Ignition Perspective](https://github.com/neiroc-02/IIOT-4.0-Project/assets/140917053/6f35b826-1244-40c7-8dd2-d0304887d41d)
 
 ### Downloading Ignition Gateway on the Pi
 
-You can run the Ignition Gateway on a Raspberry Pi and use Ignition Designer. Download the Gateway on the Pi and PC.  Then run the Designer on your PC to view the project we have. See this ![Ignition Quick Start Guide]([https://inductiveautomation.com/downloads/ignition/8.1.31](https://docs.inductiveautomation.com/display/DOC80/Quick+Start+Guide))The steps are as follows:
+You can run the Ignition Gateway on a Raspberry Pi and use Ignition Designer. Download the Gateway on the Pi and PC.  Then run the Designer on your PC to view the project we have. See this [Ignition Quick Start Guide]([https://inductiveautomation.com/downloads/ignition/8.1.31](https://docs.inductiveautomation.com/display/DOC80/Quick+Start+Guide)) The steps are as follows:
 
 1. Download Ignition [here](https://inductiveautomation.com/downloads/ignition/8.1.31) and be sure to chose the correct one for your Operating System. If you run a Raspberry Pi OS on a 64 bit Architecture, you should choose __Ignition - Linux AARCH64 zip__.
 2. After your Download finishes, open your terminal and enter the Downloads folder using ```cd Downloads```.
