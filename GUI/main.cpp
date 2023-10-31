@@ -745,18 +745,38 @@ int main(int, char**)
 */
 					//MEAGAN 09/06
 						ImGui::PushItemWidth(-1);
+						
 						ImGui::RadioButton("Reverse", &(step[p.second.device_index]), -1);
 						ImGui::SameLine();
 						ImGui::RadioButton("Stop", &(step[p.second.device_index]), 0);
 						ImGui::SameLine();
 						ImGui::RadioButton("Forward", &(step[p.second.device_index]), 1);
 
+						// MEAGAN - Test this when you get home 10/31
+						/*
+						if (ImGui::SmallButton("Reverse")){
+							step[p.second.device_index] = -1;
+							system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/stepperRun\" -m \"") + std::to_string(step[p.second.device_index]) + "\" > /dev/null)&").c_str());
+						}
+						ImGui::SameLine();
+						if (ImGui::SmallButton("Stop")){
+							step[p.second.device_index] = 0;
+							system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/stepperRun\" -m \"") + std::to_string(step[p.second.device_index]) + "\" > /dev/null)&").c_str());
+						}
+						ImGui::SameLine();
+						if (ImGui::SmallButton("Forward")){
+							step[p.second.device_index] = 1;
+							system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/stepperRun\" -m \"") + std::to_string(step[p.second.device_index]) + "\" > /dev/null)&").c_str());
+						}
+						*/
+
 						//ImGui::SliderInt("##Stepper Run", &(step[p.second.device_index]), -2000, 2000);	
 						ImGui::PopItemWidth();
+						
 						ImGui::Spacing();
 						ImGui::SameLine(ImGui::GetColumnWidth() * (1.0/4.0));
 						if (ImGui::SmallButton("Update StepperRun")){
-							system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/stepperStep\" -m \"") + std::to_string(step[p.second.device_index]) + "\" > /dev/null)&").c_str());
+							system((std::string("(sudo mosquitto_pub -d -t \"line1/" + p.second.device_name + "/out/stepperRun\" -m \"") + std::to_string(step[p.second.device_index]) + "\" > /dev/null)&").c_str());
 						}	
 
 /*
