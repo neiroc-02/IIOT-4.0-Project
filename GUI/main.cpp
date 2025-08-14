@@ -98,9 +98,9 @@ struct Label { //These labels are used to
 };
 
 
-const int THING_COUNT = 30;						//The number of things in the GUI, must be adjusted in the map as well
+const int THING_COUNT = 30;						// The number of things in the GUI, must be adjusted in the map as well
 const int STRING_SIZE = 12;
-												//These arrays/vectors are used to manage the GUI inputs  
+												// These arrays/vectors are used to manage the GUI inputs  
 static char msg[THING_COUNT][STRING_SIZE];
 std::vector<int> step(THING_COUNT, 0);
 std::vector<int> spd(THING_COUNT, 5);
